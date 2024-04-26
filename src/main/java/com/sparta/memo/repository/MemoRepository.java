@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,6 +15,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+@Repository
 public class MemoRepository {
 
   private final JdbcTemplate jdbcTemplate;
@@ -44,6 +46,16 @@ public class MemoRepository {
     return memo;
   }
 
+  public void update(Long id, MemoRequestDto requestDto) {
+    String sql = "UPDATE memo SET username = ?, contents = ? WHERE id = ?";
+    jdbcTemplate.update(sql, requestDto.getUsername(), requestDto.getContents(), id);
+  }
+
+  public void delete(Long id) {
+    String sql = "DELETE FROM memo WHERE id = ?";
+    jdbcTemplate.update(sql, id);
+  }
+
   public List<MemoResponseDto> findAll() {
     // DB 조회
     String sql = "SELECT * FROM memo";
@@ -58,16 +70,6 @@ public class MemoRepository {
         return new MemoResponseDto(id, username, contents);
       }
     });
-  }
-
-  public void update(Long id, MemoRequestDto requestDto) {
-    String sql = "UPDATE memo SET username = ?, contents = ? WHERE id = ?";
-    jdbcTemplate.update(sql, requestDto.getUsername(), requestDto.getContents(), id);
-  }
-
-  public void delete(Long id) {
-    String sql = "DELETE FROM memo WHERE id = ?";
-    jdbcTemplate.update(sql, id);
   }
 
   public Memo findById(Long id) {
